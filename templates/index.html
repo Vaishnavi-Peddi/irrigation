@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Irrigation Predictor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        h1 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+        form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            background: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        p {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <h1>Irrigation Predictor</h1>
+    <form id="predictionForm">
+        <label for="soil_moisture">Soil Moisture:</label>
+        <input type="number" step="0.01" id="soil_moisture" name="soil_moisture" required>
+        
+        <label for="crop_type">Crop Type:</label>
+        <select id="crop_type" name="crop_type" required>
+            <option value="0">Wheat</option>
+            <option value="1">Corn</option>
+            <option value="2">Rice</option>
+            <option value="3">Soybean</option>
+            <option value="4">Barley</option>
+        </select>
+        
+        <label for="rain_probability">Rain Probability:</label>
+        <input type="number" step="0.01" id="rain_probability" name="rain_probability" required>
+        
+        <label for="growth_state">Growth State:</label>
+        <select id="growth_state" name="growth_state" required>
+            <option value="0">Seedling</option>
+            <option value="1">Vegetative</option>
+            <option value="2">Flowering</option>
+            <option value="3">Mature</option>
+            <option value="4">Harvest</option>
+        </select>
+        
+        <button type="button" onclick="submitForm()">Predict</button>
+    </form>
+    <p id="result"></p>
+
+    <script>
+        function submitForm() {
+            const formData = {
+                soil_moisture: parseFloat(document.getElementById("soil_moisture").value),
+                crop_type: parseInt(document.getElementById("crop_type").value),
+                rain_probability: parseFloat(document.getElementById("rain_probability").value),
+                growth_state: parseInt(document.getElementById("growth_state").value)
+            };
+
+            fetch('/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById("result").innerText = `Error: ${data.error}`;
+                } else {
+                    document.getElementById("result").innerText = 
+                        `Water Level: ${data.water_level}, Flow Rate: ${data.flow_rate}, Irrigation Duration: ${data.irrigation_duration}`;
+                }
+            })
+            .catch(error => {
+                document.getElementById("result").innerText = `Error: ${error}`;
+            });
+        }
+    </script>
+</body>
+</html>
